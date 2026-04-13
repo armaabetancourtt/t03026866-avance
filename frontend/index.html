@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aeroméxico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --blue:        #1A6EE8;
+      --blue-mid:    #1254C0;
+      --blue-dark:   #0B3A8C;
+      --blue-deeper: #071F52;
+      --cyan:        #38BDF8;
+      --cyan-glow:   rgba(56,189,248,0.18);
+      --bg:          #050C1F;
+      --bg2:         #080F24;
+      --bg3:         #0D1730;
+      --bg4:         #111D3C;
+      --border:      rgba(56,189,248,0.14);
+      --border-hi:   rgba(56,189,248,0.35);
+      --text:        #E8EEF8;
+      --muted:       #6B7FA8;
+      --card:        rgba(13,23,48,0.8);
+      --radius:      16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 52px;
+      height: 66px;
+      background: rgba(5,12,31,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-size: 19px;
+      overflow:hidden;
+      padding: 4px;
+      box-shadow: 0 0 20px rgba(26,110,232,0.4);
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .logo-text {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .logo-text span { color: var(--cyan); }
+    nav { display: flex; gap: 36px; align-items: center; }
+    nav a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      transition: color .2s;
+    }
+    nav a:hover, nav a.active { color: var(--cyan); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 120px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 50% -5%, rgba(26,110,232,0.3) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 50% at 90% 90%, rgba(56,189,248,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 10% 80%, rgba(11,58,140,0.18) 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    }
+    .hero-dots {
+      position: absolute; inset: 0; z-index: 0;
+      background-image: radial-gradient(circle, rgba(56,189,248,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-lines {
+      position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .hero-lines::before, .hero-lines::after {
+      content: '';
+      position: absolute; left: -10%; right: -10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(56,189,248,0.2), transparent);
+    }
+    .hero-lines::before { top: 38%; }
+    .hero-lines::after  { top: 62%; }
+
+    .hero-content { position: relative; z-index: 1; text-align: center; max-width: 720px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(56,189,248,0.07);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 100px;
+      padding: 7px 18px;
+      font-size: 0.72rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
+
+    .hero h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+      line-height: 1.08;
+      margin-bottom: 20px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+    }
+    .gradient-word {
+      background: linear-gradient(135deg, #60B0FF 0%, var(--cyan) 55%, #A5F3FC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.75;
+      margin-bottom: 52px;
+      font-weight: 300;
+    }
+
+    /* ── SEARCH CARD ── */
+    .search-card {
+      background: rgba(8,15,36,0.88);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 38px 42px;
+      width: 100%;
+      max-width: 860px;
+      position: relative; z-index: 1;
+      box-shadow:
+        0 40px 100px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(56,189,248,0.04) inset,
+        0 1px 0 rgba(56,189,248,0.08) inset;
+      backdrop-filter: blur(24px);
+    }
+    .search-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .search-card-header h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+    .trip-pills { display: flex; gap: 6px; }
+    .pill {
+      padding: 5px 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .pill.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .field label {
+      display: block;
+      font-size: 0.67rem;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 13px; pointer-events: none; z-index: 1;
+      opacity: 0.7;
+    }
+    .field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px 16px 14px 40px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.93rem;
+      outline: none;
+      transition: border-color .2s, background .2s, box-shadow .2s;
+    }
+    .field input:focus {
+      border-color: var(--cyan);
+      background: rgba(56,189,248,0.04);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.07);
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5) brightness(1.4); cursor: pointer; }
+
+    .btn-search {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 0 26px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+      height: 52px;
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 20px rgba(26,110,232,0.35);
+    }
+    .btn-search:hover {
+      box-shadow: 0 6px 28px rgba(26,110,232,0.55);
+      transform: translateY(-1px);
+    }
+    .btn-search:active { transform: translateY(0); }
+    .btn-search:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── RESULTS ── */
+    .results-section {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 56px 24px 100px;
+    }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .results-header h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .results-count {
+      background: rgba(56,189,248,0.08);
+      border: 1px solid rgba(56,189,248,0.18);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 0.78rem;
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    /* ── FLIGHT CARD ── */
+    .flight-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 110px 1fr auto auto;
+      align-items: center;
+      gap: 22px;
+      transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .flight-card::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--blue), var(--cyan));
+      opacity: 0;
+      transition: opacity .2s;
+    }
+    .flight-card:hover {
+      border-color: var(--border-hi);
+      background: rgba(13,23,48,0.97);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(56,189,248,0.08);
+      transform: translateY(-1px);
+    }
+
+    .extra-section {
+      padding: 60px 24px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .section-container { width: 100%; }
+
+    .destinations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    .dest-card {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      height: 350px;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+
+    .dest-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--cyan);
+    }
+
+    .dest-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.7);
+    }
+
+    .dest-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px;
+      background: linear-gradient(to top, rgba(5,12,31,0.95), transparent);
+    }
+
+    .dest-info h4 { font-family: 'Sora'; color: #fff; margin-bottom: 5px; }
+    .dest-info p { color: var(--cyan); font-weight: 600; font-size: 0.9rem; }
+
+    .benefits-bg { background: rgba(56,189,248,0.03); border-radius: 30px; margin-top: 40px; margin-bottom: 80px; }
+    .benefits-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+
+    .benefit-item i {
+      color: var(--cyan);
+      width: 40px;
+      height: 40px;
+      margin-bottom: 15px;
+    }
+
+    .benefit-item h5 { font-family: 'Sora'; margin-bottom: 10px; font-size: 1.1rem; }
+    .benefit-item p { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+
+    .flight-card:hover::before { opacity: 1; }
+
+    .airline-block { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .airline-logo {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-deeper) 100%);
+      border: 1px solid rgba(56,189,248,0.15);
+      display: grid; place-items: center;
+      font-size: 20px;
+    }
+    .airline-name { font-size: 0.7rem; color: var(--muted); font-weight: 500; text-align: center; }
+
+    .flight-route { display: flex; align-items: center; gap: 16px; }
+    .route-point { text-align: center; min-width: 68px; }
+    .route-time {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .route-city { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+    .route-code {
+      font-size: 0.66rem;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .route-line { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .route-duration { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
+    .route-bar { width: 100%; display: flex; align-items: center; gap: 4px; }
+    .route-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+    .route-bar-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--blue), var(--cyan), rgba(56,189,248,0.2)); }
+    .route-plane { font-size: 12px; flex-shrink: 0; }
+    .route-nonstop { font-size: 0.63rem; color: rgba(56,189,248,0.55); letter-spacing: 0.5px; }
+
+    .flight-meta { text-align: center; }
+    .seats-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .seats-count { font-size: 0.95rem; font-weight: 600; }
+    .seats-count.low { color: #FCA5A5; }
+
+    .flight-price-col { text-align: right; min-width: 130px; }
+    .price-from { font-size: 0.65rem; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .price-amount {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .price-currency { font-size: 0.82rem; font-weight: 400; color: var(--muted); margin-left: 2px; }
+    .btn-book {
+      display: block; width: 100%;
+      margin-top: 10px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 10px 0;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      box-shadow: 0 2px 12px rgba(26,110,232,0.3);
+    }
+    .btn-book:hover { box-shadow: 0 4px 20px rgba(26,110,232,0.5); transform: translateY(-1px); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(2,7,20,0.82);
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 42px;
+      width: 100%; max-width: 500px;
+      position: relative;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(56,189,248,0.05) inset;
+    }
+    .modal h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 6px; letter-spacing: -0.3px;
+    }
+    .modal-subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 28px; }
+    .modal-flight-info {
+      background: rgba(26,110,232,0.08);
+      border: 1px solid rgba(26,110,232,0.2);
+      border-radius: 12px;
+      padding: 18px; margin-bottom: 24px;
+    }
+    .modal-flight-route { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; }
+    .modal-flight-meta { display: flex; gap: 16px; font-size: 0.8rem; color: var(--muted); flex-wrap: wrap; }
+    .modal-flight-price {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.45rem; font-weight: 700;
+      color: var(--cyan); margin-top: 10px;
+    }
+    .modal-field { margin-bottom: 16px; }
+    .modal-field label {
+      display: block; font-size: 0.67rem;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--muted); margin-bottom: 8px; font-weight: 600;
+    }
+    .modal-field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: var(--text); font-family: inherit; font-size: 0.93rem;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .modal-field input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(56,189,248,0.07); }
+    .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-cancel {
+      flex: 1; background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted); border-radius: 12px; padding: 13px;
+      font-family: inherit; font-size: 0.9rem; cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-cancel:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+    .btn-confirm {
+      flex: 2;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+      color: #fff; border: none; border-radius: 12px; padding: 13px;
+      font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: all .2s; box-shadow: 0 4px 20px rgba(26,110,232,0.3);
+    }
+    .btn-confirm:hover { box-shadow: 0 4px 28px rgba(26,110,232,0.5); }
+    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+    .modal-close {
+      position: absolute; top: 18px; right: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted); width: 32px; height: 32px;
+      border-radius: 50%; font-size: 1rem; cursor: pointer;
+      display: grid; place-items: center; transition: background .2s, color .2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+
+    /* ── SUCCESS ── */
+    .success-banner {
+      background: rgba(16,185,129,0.09);
+      border: 1px solid rgba(16,185,129,0.22);
+      border-radius: 12px; padding: 18px 20px;
+      margin-bottom: 24px; display: flex; gap: 14px; align-items: flex-start;
+    }
+    .success-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .success-text strong { display: block; margin-bottom: 4px; color: #34D399; font-weight: 600; }
+    .success-text span { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── LOADING / EMPTY ── */
+    .empty-state { text-align: center; padding: 80px 24px; color: var(--muted); }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state h4 { font-family: 'Sora', sans-serif; font-size: 1.1rem; margin-bottom: 8px; color: var(--text); font-weight: 600; }
+    .loading-wrap { text-align: center; padding: 60px; }
+    .spinner {
+      width: 38px; height: 38px;
+      border: 2px solid rgba(56,189,248,0.1);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 10px; padding: 12px 16px;
+      color: #FCA5A5; font-size: 0.85rem; margin-top: 14px;
+    }
+
+    /* ── BOOKINGS TABLE ── */
+    .bookings-table { width: 100%; border-collapse: collapse; }
+    .bookings-table th {
+      text-align: left; padding: 10px 16px;
+      font-size: 0.67rem; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600;
+    }
+    .bookings-table td {
+      padding: 14px 16px; font-size: 0.875rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .bookings-table tr:hover td { background: rgba(56,189,248,0.025); }
+
+    
+    @media (max-width: 700px) {
+      header { padding: 0 20px; }
+      .nav-badge { display: none; }
+      .destinations-grid { grid-template-columns: 1fr; }
+      .search-card { padding: 24px 20px; }
+      .search-row { grid-template-columns: 1fr; }
+      .flight-card { grid-template-columns: 1fr 1fr; }
+      .flight-price-col { text-align: left; }
+      .airline-block { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <a class="logo" href="#">
+      <img src="data:image/svg+xml,%3csvg%20width='176'%20height='25'%20viewBox='0%200%20176%2025'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M42.552%2013.4648L44.1882%209.06025C44.2284%208.96164%2044.2649%208.91052%2044.3014%208.91052C44.338%208.91052%2044.3708%208.96164%2044.4074%209.06025L46.0436%2013.4648H42.552ZM44.5206%206.15674H41.2372C41.2372%207.01136%2041.628%207.77468%2042.2379%208.28233L38.1438%2018.2967H40.6857L41.8106%2015.4224H46.7813L47.8952%2018.2967H50.4372L45.9084%207.19762C45.6345%206.56214%2045.1707%206.21153%2044.5169%206.16039L44.5206%206.15674Z'%20fill='white'/%3e%3cpath%20d='M59.8636%208.22754V6.16039H51.4342V15.6854C51.4342%2016.54%2051.6935%2017.1864%2052.2085%2017.632C52.7271%2018.0776%2053.4064%2018.2967%2054.2538%2018.2967H59.8636V16.2296H54.5971C54.0711%2016.2296%2053.8082%2016.047%2053.8082%2015.6854V13.2567H59.6006V11.1895H53.8082V8.22754H59.8636Z'%20fill='white'/%3e%3cpath%20d='M67.4054%2011.3502C67.0329%2011.6314%2066.4668%2011.7702%2065.7035%2011.7702H63.7167V8.2312H65.7035C66.5727%208.2312%2067.168%208.38094%2067.4858%208.68407C67.8035%208.98355%2067.9642%209.43644%2067.9642%2010.0391C67.9642%2010.6417%2067.7779%2011.0726%2067.4091%2011.3538L67.4054%2011.3502ZM70.3345%2010.0427C70.3345%208.78633%2069.9181%207.8258%2069.0854%207.1611C68.2527%206.49639%2067.1278%206.16404%2065.7071%206.16404H61.3354V18.2967H63.7094V13.8374H65.8203L68.6764%2018.2967H71.5397L68.2564%2013.3224C69.6406%2012.7636%2070.3308%2011.6716%2070.3308%2010.0464H70.3345V10.0427Z'%20fill='white'/%3e%3cpath%20d='M80.2978%2015.2654C79.6915%2015.9739%2078.8259%2016.3282%2077.7047%2016.3282C76.5834%2016.3282%2075.7069%2015.9739%2075.1006%2015.2654C74.4944%2014.5569%2074.1912%2013.5233%2074.1912%2012.1646C74.1912%2010.806%2074.4944%209.798%2075.1006%209.11869C75.7069%208.43937%2076.5761%208.09972%2077.7047%208.09972C78.8332%208.09972%2079.6988%208.43937%2080.3051%209.11869C80.9113%209.798%2081.2108%2010.8133%2081.2108%2012.1646C81.2108%2013.516%2080.9077%2014.5569%2080.3014%2015.2654H80.2978ZM77.712%206.15674C75.8347%206.15674%2074.3885%206.68266%2073.3731%207.73085C72.3578%208.78269%2071.8502%2010.2618%2071.8502%2012.1719C71.8502%2014.0821%2072.3578%2015.5795%2073.3731%2016.6569C74.3885%2017.7343%2075.8347%2018.2748%2077.712%2018.2748C79.5892%2018.2748%2081.0245%2017.7343%2082.0326%2016.6569C83.0442%2015.5758%2083.5482%2014.0821%2083.5482%2012.1719C83.5482%2010.2618%2083.0442%208.77903%2082.0326%207.73085C81.0209%206.67901%2079.5819%206.15674%2077.712%206.15674Z'%20fill='white'/%3e%3cpath%20d='M100.363%2015.6854C100.363%2016.54%20100.622%2017.1864%20101.137%2017.632C101.656%2018.0776%20102.335%2018.2967%20103.183%2018.2967H108.792V16.2296H103.526C103%2016.2296%20102.737%2016.047%20102.737%2015.6854V13.2567H108.529V11.1895H102.737V8.22754H108.792V6.16039H100.363V15.6854Z'%20fill='white'/%3e%3cpath%20d='M121.133%206.15674H118.339L115.732%209.714C115.618%209.87104%20115.385%209.87104%20115.271%209.714L112.671%206.15674H109.877L114.117%2011.9309L109.439%2018.2931H112.233L115.297%2014.1149C115.399%2013.9761%20115.607%2013.9761%20115.71%2014.1149L118.781%2018.2967H121.568L116.904%2011.9346L121.137%206.16039H121.133V6.15674Z'%20fill='white'/%3e%3cpath%20d='M122.59%206.15674V18.2931H124.964V8.53068C124.964%207.21953%20123.902%206.15674%20122.59%206.15674Z'%20fill='white'/%3e%3cpath%20d='M128.193%207.77101C127.028%208.84477%20126.447%2010.3166%20126.447%2012.1829C126.447%2014.0492%20127.028%2015.5283%20128.189%2016.635C129.351%2017.7416%20130.925%2018.2931%20132.912%2018.2931C134.106%2018.2931%20135.344%2018.1433%20136.63%2017.8439V15.7621C135.176%2016.0981%20133.934%2016.2624%20132.904%2016.2624C131.655%2016.2624%20130.655%2015.9045%20129.91%2015.1923C129.164%2014.4765%20128.792%2013.4721%20128.792%2012.1756C128.792%2010.8791%20129.164%209.90756%20129.906%209.22095C130.647%208.53433%20131.677%208.19103%20132.992%208.19103C133.967%208.19103%20135.18%208.36268%20136.63%208.70234V6.58404C135.34%206.30282%20134.128%206.16039%20132.999%206.16039C130.961%206.16039%20129.358%206.69726%20128.193%207.77101Z'%20fill='white'/%3e%3cpath%20d='M146.184%2015.2727C145.578%2015.9812%20144.712%2016.3355%20143.587%2016.3355C142.462%2016.3355%20141.589%2015.9812%20140.983%2015.2727C140.377%2014.5642%20140.07%2013.5306%20140.07%2012.1719C140.07%2010.8133%20140.373%209.80165%20140.983%209.12234C141.589%208.44303%20142.459%208.10337%20143.587%208.10337C144.716%208.10337%20145.581%208.44303%20146.188%209.12234C146.794%209.80165%20147.093%2010.817%20147.093%2012.1719C147.093%2013.5269%20146.79%2014.5642%20146.184%2015.2727ZM147.919%207.7345C146.907%206.68266%20145.468%206.15674%20143.594%206.15674C141.721%206.15674%20140.271%206.68266%20139.256%207.7345C138.24%208.78634%20137.733%2010.2655%20137.733%2012.1792C137.733%2014.093%20138.24%2015.5868%20139.256%2016.6678C140.271%2017.7489%20141.717%2018.2858%20143.594%2018.2858C145.472%2018.2858%20146.907%2017.7452%20147.919%2016.6678C148.93%2015.5868%20149.434%2014.093%20149.434%2012.1792C149.434%2010.2655%20148.93%208.78634%20147.919%207.7345Z'%20fill='white'/%3e%3cpath%20d='M150.924%2017.0988C150.968%2017.0988%20151.012%2017.0988%20151.052%2017.0951C151.092%2017.0951%20151.129%2017.0842%20151.162%2017.0696C151.195%2017.055%20151.22%2017.0331%20151.239%2017.0038C151.257%2016.9746%20151.268%2016.9344%20151.268%2016.8833C151.268%2016.8395%20151.26%2016.8066%20151.242%2016.7811C151.224%2016.7555%20151.202%2016.7336%20151.176%2016.7226C151.151%2016.708%20151.118%2016.7007%20151.085%2016.6934C151.052%2016.6897%20151.016%2016.6861%20150.983%2016.6861H150.716V17.0988H150.928H150.924ZM151.016%2016.5217C151.169%2016.5217%20151.286%2016.551%20151.359%2016.6131C151.432%2016.6751%20151.472%2016.7664%20151.472%2016.8943C151.472%2017.0111%20151.439%2017.0988%20151.374%2017.1499C151.308%2017.2047%20151.228%2017.2376%20151.129%2017.2449L151.501%2017.8183H151.286L150.932%2017.2595H150.716V17.8183H150.515V16.5181H151.019H151.016V16.5217ZM150.099%2017.5444C150.147%2017.6612%20150.209%2017.7599%20150.293%2017.8475C150.377%2017.9315%20150.472%2018.0009%20150.585%2018.0484C150.698%2018.0959%20150.819%2018.1214%20150.95%2018.1214C151.081%2018.1214%20151.198%2018.0959%20151.312%2018.0484C151.421%2018.0009%20151.52%2017.9315%20151.6%2017.8475C151.684%2017.7635%20151.746%2017.6612%20151.794%2017.5444C151.841%2017.4275%20151.863%2017.3033%20151.863%2017.1645C151.863%2017.0257%20151.841%2016.9089%20151.794%2016.792C151.746%2016.6788%20151.684%2016.5765%20151.6%2016.4925C151.516%2016.4085%20151.421%2016.3428%20151.312%2016.2917C151.202%2016.2442%20151.081%2016.2186%20150.95%2016.2186C150.819%2016.2186%20150.698%2016.2442%20150.585%2016.2917C150.472%2016.3391%20150.377%2016.4085%20150.293%2016.4925C150.209%2016.5765%20150.147%2016.6751%20150.099%2016.792C150.052%2016.9052%20150.03%2017.0294%20150.03%2017.1645C150.03%2017.2997%20150.052%2017.4275%20150.099%2017.5444ZM149.913%2016.7299C149.971%2016.5948%20150.052%2016.4779%20150.154%2016.3793C150.256%2016.2807%20150.377%2016.204%20150.512%2016.1456C150.647%2016.0908%20150.793%2016.0616%20150.946%2016.0616C151.1%2016.0616%20151.242%2016.0908%20151.377%2016.1456C151.512%2016.2004%20151.629%2016.2807%20151.732%2016.3793C151.834%2016.4779%20151.914%2016.5948%20151.973%2016.7299C152.031%2016.865%20152.06%2017.0111%20152.06%2017.1682C152.06%2017.3252%20152.031%2017.4786%20151.973%2017.6138C151.914%2017.7489%20151.834%2017.8694%20151.732%2017.968C151.629%2018.0666%20151.512%2018.147%20151.377%2018.2018C151.242%2018.2565%20151.1%2018.2858%20150.946%2018.2858C150.793%2018.2858%20150.651%2018.2565%20150.512%2018.2018C150.377%2018.147%20150.256%2018.0666%20150.154%2017.968C150.052%2017.8694%20149.971%2017.7489%20149.913%2017.6138C149.854%2017.4786%20149.825%2017.3289%20149.825%2017.1682C149.825%2017.0075%20149.854%2016.865%20149.913%2016.7299Z'%20fill='white'/%3e%3cpath%20d='M92.1748%2016.0214C92.7482%2016.0214%2093.223%2015.6671%2093.5955%2014.9586L96.1374%2010.1705V18.2931H98.4968V6.15674H95.9439L91.9556%2013.0485C91.9155%2013.1179%2091.8643%2013.1544%2091.8023%2013.1544C91.7402%2013.1544%2091.689%2013.1179%2091.6489%2013.0485L88.1318%206.96022C87.8396%206.46352%2087.3064%206.15674%2086.7293%206.15674H84.107C84.107%207.01136%2084.4978%207.77467%2085.1077%208.27868V18.2931H87.4671V10.1705L90.009%2014.9586C90.3815%2015.6671%2090.8527%2016.0214%2091.4297%2016.0214H92.1748Z'%20fill='white'/%3e%3cpath%20d='M26.8548%204.97703C26.559%204.97703%2026.2777%205.02087%2026.0805%205.07565C23.6445%204.94417%2022.4794%205.47739%2021.5006%205.47739C20.9126%205.47739%2018.6811%204.4292%2016.9207%203.73163C16.9207%203.73163%2019.1486%203.16554%2021.2632%203.16554C23.3779%203.16554%2025.4633%204.35981%2026.0769%205.072C24.7402%201.88361%2020.2844%200.0100098%2017.7133%200.0100098C12.2897%200.0100098%209.30586%202.7017%205.36511%202.76744C4.90493%202.77475%203.63031%202.76744%203.63031%202.76744C3.63031%205.17791%204.53241%206.58402%204.9305%206.9675C3.94805%207.53359%200%2012.486%200%2014.7979L0.171654%2015.2288L3.35274%2015.6379L2.73551%2018.8957L2.90717%2019.3266L6.03712%2019.7357L4.90493%2023.6034L5.07659%2024.0343C5.07659%2024.0343%206.15765%2024.4397%207.69523%2024.4397C9.07577%2024.4397%2015.0325%2024.6041%2015.9346%2016.9673C15.9383%2016.9344%2015.942%2016.9052%2015.9456%2016.876C16.9974%2020.9957%2019.7549%2021.7553%2025.4268%2021.7553C27.0301%2021.7553%2026.3617%2019.6297%2026.5371%2018.9322C26.7124%2018.8263%2026.8511%2018.5304%2026.7489%2018.1835C26.8511%2018.0958%2026.9863%2017.8767%2026.9863%2017.6977C26.9863%2017.285%2026.7708%2016.7372%2026.7708%2015.8461C27.2456%2015.7109%2028.1039%2015.5429%2028.1039%2014.8892C28.1039%2014.4984%2027.2273%2012.3436%2026.6831%2010.9265C26.5991%2010.7037%2026.4165%2010.5284%2026.1828%2010.5284C25.8139%2010.5248%2025.6605%2011.0215%2024.6525%2011.0215C22.7972%2011.0251%2023.4801%209.25744%2017.8813%209.61901C17.1947%209.66283%2017.0011%209.86371%2016.9171%2010.5175C16.7126%2012.1098%2016.7527%2016.4158%2017.6877%2019.0016C16.508%2017.7196%2016.1282%2015.2763%2015.9493%2013.3808C15.5731%2016.8942%2015.3686%2021.7079%2010.9201%2023.3002C9.00638%2023.9576%206.88809%2023.8298%204.91589%2023.5997C6.11017%2023.618%207.30444%2023.5815%208.48411%2023.4208C9.25838%2023.3185%2010.0217%2023.1432%2010.7375%2022.8254C15.8981%2020.6524%2014.2875%2013.7168%2015.5329%2010.3202C13.2503%2012.6175%2012.801%2018.8336%207.18392%2019.1404C5.69382%2019.228%204.21466%2019.1111%202.74647%2018.8883C4.21101%2018.9285%205.69381%2018.9103%207.14009%2018.7094C12.1802%2018.0264%2012.2569%2012.5919%2014.6272%209.85275C13.6593%2010.0609%2012.7134%2010.3677%2011.8478%2010.8425C10.5695%2011.5109%209.65648%2012.5664%208.59003%2013.5598C7.21314%2014.8453%205.68286%2015.2325%203.83118%2015.1156C2.55656%2015.0535%201.28193%2014.9513%200.0109562%2014.7942C0.0620873%2014.7942%202.19499%2014.7358%202.19499%2014.7358C3.59013%2014.6664%205.0985%2014.754%206.39139%2014.177C7.36653%2013.7606%208.07872%2012.9827%208.7836%2012.2084C10.0984%2010.7147%2011.5593%209.6811%2013.484%209.12231C14.9193%208.68404%2019.5942%208.2056%2022.4977%208.31517C24.2106%208.38091%2027.724%208.80822%2029.9811%209.71397C29.9446%209.70666%2029.9117%209.6957%2029.8752%209.6884C28.9219%209.49483%2027.8007%209.60805%2026.8877%209.96597C27.8372%209.99154%2028.8708%2010.0536%2029.678%2010.2581C30.3901%2010.4371%2031.778%2010.7402%2031.9642%2011.5182C31.9716%2011.467%2032.0044%2011.2698%2032.0044%2010.795C32.0044%207.78194%2029.4953%204.97703%2026.8548%204.97703Z'%20fill='white'/%3e%3cpath%20d='M171.055%203.26419L170.95%203.21307L170.975%203.15463L171.275%203.28611L171.249%203.35185L171.136%203.30072L170.99%203.62577L170.913%203.58925L171.055%203.26419Z'%20fill='white'/%3e%3cpath%20d='M171.333%203.31533L171.457%203.37377L171.402%203.70612L171.643%203.46142L171.76%203.52351L171.578%203.90333L171.501%203.86681L171.658%203.55272L171.399%203.81568L171.326%203.77916L171.377%203.41394L171.22%203.72803L171.147%203.69151L171.333%203.31533Z'%20fill='white'/%3e%3cpath%20d='M172.235%206.61329C173.689%208.06687%20174.646%2010.0245%20174.803%2012.2304C175.146%2017.1025%20171.446%2021.3281%20166.549%2021.6677C164.244%2021.8248%20162.082%2021.098%20160.409%2019.7795L160.398%2019.7905C162.14%2021.4048%20164.525%2022.3251%20167.089%2022.1462C171.987%2021.8029%20175.683%2017.5773%20175.343%2012.7052C175.168%2010.2436%20173.995%208.08878%20172.246%206.60233L172.239%206.61329H172.235Z'%20fill='white'/%3e%3cpath%20d='M157.257%2017.1974C157.308%2017.5042%20157.316%2017.6138%20157.283%2017.738C157.243%2017.9023%20157.14%2018.0192%20156.972%2018.0849C156.596%2018.2347%20156.231%2018.0119%20156.03%2017.5079C155.811%2016.9564%20155.924%2016.551%20156.352%2016.3611L156.472%2016.6532C156.191%2016.8103%20156.129%2017.0477%20156.271%2017.4093C156.403%2017.7416%20156.615%2017.8877%20156.837%2017.7964C157.016%2017.7306%20157.049%2017.5736%20156.972%2017.1755L156.943%2017.0185C156.87%2016.624%20156.856%2016.456%20156.907%2016.288C156.954%2016.1018%20157.06%2015.9739%20157.228%2015.9118C157.634%2015.7511%20158.013%2015.9958%20158.24%2016.5619C158.484%2017.1719%20158.353%2017.6284%20157.875%2017.8256L157.754%2017.5261C158.086%2017.3837%20158.17%2017.0769%20157.995%2016.635C157.849%2016.2734%20157.615%2016.1127%20157.378%2016.2113C157.181%2016.2917%20157.133%2016.4706%20157.206%2016.8797L157.261%2017.2011H157.257V17.1974Z'%20fill='white'/%3e%3cpath%20d='M156.461%2014.1113L155.289%2012.8586L155.278%2012.4276L156.224%2013.4612L157.571%2012.3327L157.579%2012.7527L156.439%2013.6913L156.808%2014.0967L157.608%2014.0821L157.615%2014.4071L155.325%2014.4619L155.318%2014.1296L156.461%2014.1113Z'%20fill='white'/%3e%3cpath%20d='M156.169%208.95436L156.289%208.59644L157.239%209.93316L158.123%2010.2399L158.013%2010.5504L157.126%2010.2399L155.541%2010.7147L155.68%2010.3422L156.947%209.99525L156.169%208.95436Z'%20fill='white'/%3e%3cpath%20d='M158.788%205.74771L158.306%206.33937L159.752%207.51539L159.405%207.93539L157.959%206.75937L157.473%207.34373L157.144%207.07711L158.463%205.48475L158.788%205.74771Z'%20fill='white'/%3e%3cpath%20d='M161.885%203.58559L160.731%204.26125L160.972%204.68126L162.038%204.06039L162.235%204.40004L161.176%205.01727L161.457%205.49935L162.641%204.81274L162.853%205.17797L161.198%206.13849L160.04%204.1736L161.673%203.22402L161.885%203.58559Z'%20fill='white'/%3e%3cpath%20d='M165.015%203.29706C164.887%203.08889%20164.836%202.99393%20164.766%202.83323C164.744%202.99393%20164.726%203.11811%20164.668%203.35185L164.573%203.79011L165.241%203.6842L165.015%203.30072V3.29706ZM166.329%204.47308L165.727%204.51326L165.431%204.02021L164.503%204.16629L164.376%204.72874L163.802%204.87482L164.408%202.38401L164.974%202.2927L166.329%204.47308Z'%20fill='white'/%3e%3cpath%20d='M167.911%204.59725L167.4%204.52056L167.977%202.2854L168.747%202.4388L168.879%204.23934L169.879%202.73097L170.606%202.97932L170.011%205.19988L169.529%205.02091L170.044%203.23132L168.937%204.84196L168.517%204.73239L168.345%202.80037L167.911%204.59725Z'%20fill='white'/%3e%3cpath%20d='M169.96%2012.5554C170.621%2012.1099%20171.172%2011.8761%20171.512%2011.8871C171.716%2011.8981%20171.958%2011.9565%20171.958%2012.2048C171.958%2012.4532%20171.716%2012.676%20171.234%2012.844C170.814%2012.9937%20170.172%2013.0302%20169.467%2012.9535C169.66%2012.7819%20169.821%2012.6504%20169.96%2012.5554ZM160.654%2013.3662C160.241%2013.337%20160.04%2013.1727%20160.04%2012.8586C160.04%2012.8184%20160.07%2011.8214%20162.367%2011.7081C162.63%2011.6935%20162.926%2011.6862%20163.371%2011.7337C163.353%2011.7337%20163.115%2011.9565%20163.115%2011.9565L162.969%2012.0843C162.414%2012.5847%20161.487%2013.421%20160.658%2013.3662H160.654ZM165.628%209.5935C165.347%209.8382%20164.799%2010.3605%20164.266%2010.8681L163.663%2011.4452C163.17%2011.3539%20162.685%2011.3137%20162.184%2011.3137C161.067%2011.3137%20160.044%2011.6168%20159.58%2012.0916C159.401%2012.2706%20159.314%2012.4678%20159.317%2012.676C159.324%2013.2129%20159.945%2013.4831%20160.135%2013.5525C161.125%2013.9177%20161.958%2013.8155%20162.834%2013.2055C163.32%2012.8695%20163.897%2012.329%20164.354%2011.8981C164.704%2011.9821%20165.106%2012.0843%20165.537%2012.2121L165.935%2012.3254C165.416%2012.8294%20164.89%2013.3553%20164.401%2013.7862L164.365%2013.8191C163.682%2014.4181%20163.192%2014.849%20162.476%2015.0061C161.976%2015.1157%20161.622%2015.0097%20161.505%2014.9403C161.494%2014.9403%20161.476%2014.9659%20161.476%2014.9659C161.888%2015.3019%20162.279%2015.4918%20162.951%2015.4334C163.587%2015.3786%20164.328%2014.9805%20165.084%2014.2793L166.103%2013.2822L166.815%2012.5774L168.258%2012.9974L168.287%2013.0083C168.272%2013.0083%20167.392%2013.8703%20167.392%2013.8703L166.625%2014.6263C165.84%2015.3859%20165.413%2015.7804%20164.953%2016.1054C164.189%2016.6386%20163.543%2016.9199%20162.969%2016.9564C162.674%2016.9746%20162.246%2016.9564%20161.888%2016.7482C161.874%2016.7446%20161.852%2016.7665%20161.852%2016.7665C162.239%2017.0988%20162.714%2017.4896%20163.536%2017.4677C164.463%2017.4421%20165.278%2017.0002%20166.556%2015.8315C167.14%2015.2983%20167.717%2014.7066%20168.229%2014.1807L169.178%2013.2238C169.803%2013.3626%20170.358%2013.421%20170.979%2013.4064C171.881%2013.3882%20172.644%2012.9609%20172.659%2012.4715C172.662%2012.1099%20172.367%2011.9163%20172.188%2011.8031C172.038%2011.7045%20171.636%2011.4854%20171.081%2011.4854C170.405%2011.4854%20169.704%2011.7812%20168.988%2012.3619L168.517%2012.7782L168.342%2012.7308L167.02%2012.3582C167.411%2012.0003%20167.743%2011.6899%20168.039%2011.4269C168.762%2010.7914%20169.558%2010.5285%20170.026%2010.4956C170.365%2010.4773%20170.96%2010.5029%20171.205%2010.6782C171.216%2010.6746%20171.231%2010.649%20171.231%2010.649C170.581%2010.0975%20170.022%2010.0245%20169.554%2010.0245C169.087%2010.0245%20168.364%2010.1706%20167.469%2010.8608C167.1%2011.142%20166.625%2011.6132%20166.125%2012.1172C166.125%2012.1099%20165.46%2011.9127%20165.46%2011.9127L165.3%2011.8615L164.598%2011.6533L164.996%2011.2808C165.471%2010.817%20165.917%2010.3824%20166.264%2010.0902C167.531%209.03105%20168.327%208.89592%20168.882%208.89227C169.489%208.89227%20169.971%209.0128%20170.314%209.26115C170.325%209.26115%20170.34%209.23558%20170.34%209.23558C169.631%208.60009%20169.116%208.39192%20168.236%208.38462C167.462%208.38097%20166.534%208.81192%20165.628%209.59715V9.5935Z'%20fill='white'/%3e%3c/svg%3e" alt="Logo" class="main-logo-img">
+    </a>
+    <nav>
+      <nav>
+      <a href="#" 
+        :class="{ active: tab === 'search' }" 
+        @click.prevent="tab = 'search'">
+        Reservar
+      </a>
+      <a href="#" 
+        :class="{ active: tab === 'bookings' }" 
+        @click.prevent="irAReservas()">
+        Mis Viajes
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO + SEARCH -->
+  <section class="hero" v-if="tab==='search'">
+    <div class="hero-bg"></div>
+    <div class="hero-dots"></div>
+    <div class="hero-lines"></div>
+    
+    <div class="hero-content">
+      <h1>Tu próximo destino<br/><span class="gradient-word">te está esperando</span></h1>
+      <p>Encuentra los mejores vuelos a los destinos más<br/>increíbles de México. Precios dinámicos en tiempo real.</p>
+    </div>
+
+    <div class="search-card">
+      <div class="search-card-header">
+        <h2>Buscar vuelo</h2>
+        <div class="trip-pills">
+          <button class="pill active">Ida</button>
+        </div>
+      </div>
+      <div class="search-row">
+        <div class="field">
+          <label>Origen</label>
+          <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="map-pin"></i></span>
+            <input v-model="search.origin" type="text" placeholder="Ciudad o aeropuerto" list="origins-list" />
+          </div>
+          <datalist id="origins-list">
+            <option v-for="c in cities" :key="c" :value="c"></option>
+          </datalist>
+        </div>
+        <div class="field">
+          <label>Destino</label>
+          <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="plane-landing"></i></span>
+            <input v-model="search.destination" type="text" placeholder="Ciudad o aeropuerto" list="destinations-list" />
+          </div>
+          <datalist id="destinations-list">
+            <option v-for="c in cities" :key="c" :value="c"></option>
+          </datalist>
+        </div>
+        <div class="field">
+          <label>Fecha de salida</label>
+          <div class="field-wrap">
+            <span class="field-icon"><i data-lucide="calendar"></i></span>
+            <input v-model="search.date" type="date" :min="today" />
+          </div>
+        </div>
+        <button class="btn-search" @click="searchFlights" :disabled="loading">
+          {{ loading ? 'Buscando…' : 'Buscar' }}
+        </button>
+      </div>
+      <div class="error-msg" v-if="searchError">{{ searchError }}</div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="results-section" v-if="tab==='search'">
+    <div class="loading-wrap" v-if="loading">
+      <div class="spinner"></div>
+      <p style="color:var(--muted);font-size:0.875rem">Buscando los mejores vuelos…</p>
+    </div>
+
+    <div v-else-if="flights.length > 0">
+      <div class="results-header">
+        <h3>Vuelos disponibles</h3>
+        <span class="results-count">{{ flights.length }} opciones encontradas</span>
+      </div>
+      <div class="flight-card" v-for="flight in flights" :key="flight.id">
+        <div class="airline-block">
+          <div class="airline-logo"></div>
+          <div class="airline-name">{{ flight.airline }}</div>
+        </div>
+        <div class="flight-route">
+          <div class="route-point">
+            <div class="route-time">{{ flight.departure }}</div>
+            <div class="route-city">{{ flight.origin.split(' ')[0] }}</div>
+            <div class="route-code">{{ flight.originCode }}</div>
+          </div>
+          <div class="route-line">
+            <div class="route-duration">{{ flight.duration }}</div>
+            <div class="route-bar">
+              <div class="route-dot"></div>
+              <div class="route-bar-line"></div>
+              <span class="route-plane"></span>
+            </div>
+            <div class="route-nonstop">Vuelo directo</div>
+          </div>
+          <div class="route-point">
+            <div class="route-time">{{ flight.arrival }}</div>
+            <div class="route-city">{{ flight.destination.split(' ')[0] }}</div>
+            <div class="route-code">{{ flight.destinationCode }}</div>
+          </div>
+        </div>
+        <div class="flight-meta">
+          <div class="seats-label">Asientos</div>
+          <div class="seats-count" :class="{low: flight.seatsAvailable < 10}">{{ flight.seatsAvailable }}</div>
+        </div>
+        <div class="flight-price-col">
+          <div class="price-from">desde</div>
+          <div class="price-amount">${{ flight.price.toLocaleString('es-MX') }}<span class="price-currency">MXN</span></div>
+          <button class="btn-book" @click="openBooking(flight)">Seleccionar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" v-else-if="hasSearched">
+      <div class="empty-icon"> </div>
+      <h4>No se encontraron vuelos</h4>
+      <p>Intenta con otros destinos u otra fecha de viaje.</p>
+    </div>
+    <div class="empty-state" v-else>
+      <div class="empty-icon"> <i data-lucide="globe-2"></i></div>
+      <h4>¿A dónde quieres volar?</h4>
+      <p>Usa el buscador para encontrar tu vuelo ideal.</p>
+    </div>
+
+    
+  </section>
+<div v-if="tab === 'search'">
+  <section class="extra-section">
+  <div class="section-container">
+    <div class="results-header">
+      <h3>Destinos que te esperan</h3>
+      <span class="results-count">Ofertas de temporada</span>
+    </div>
+    
+    <div class="destinations-grid">
+      <div class="dest-card">
+        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80" alt="Tokio">
+        <div class="dest-info">
+          <h4>Tokio, Japón</h4>
+          <p>Desde $18,500 MXN</p>
+        </div>
+      </div>
+      <div class="dest-card">
+        <img src="https://images.unsplash.com/photo-1585464231875-d9ef1f5ad396?q=80&w=800" alt="Paris">
+        <div class="dest-info">
+          <h4>París, Francia</h4>
+          <p>Desde $14,200 MXN</p>
+        </div>
+      </div>
+      <div class="dest-card">
+        <img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?q=80&w=800" alt="Australia">
+        <div class="dest-info">
+          <h4>Sídney, Australia</h4>
+          <p>Desde $22,100 MXN</p>
+        </div>
+      </div>
+
+      <div class="dest-card">
+        <img src="https://images.pexels.com/photos/1530631/pexels-photo-1530631.jpeg?auto=compress&cs=tinysrgb&w=800" alt="LosAngeles">
+        <div class="dest-info">
+          <h4>Los Ángeles, California</h4>
+          <p>Desde $42,100 MXN</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+  <section class="extra-section benefits-bg">
+    <div class="section-container">
+      <div class="benefits-row">
+        <div class="benefit-item">
+          <i data-lucide="shield-check"></i>
+          <h5>Viaje Seguro</h5>
+          <p>Protocolos de salud y seguros de viaje.</p>
+        </div>
+        <div class="benefit-item">
+          <i data-lucide="zap"></i>
+          <h5>Check-in</h5>
+          <p>Ahorra tiempo con nuestro sistema biométrico.</p>
+        </div>
+        <div class="benefit-item">
+          <i data-lucide="headset"></i>
+          <h5>Soporte 24/7</h5>
+          <p>Atención personalizada en cada etapa de tu vuelo.</p>
+        </div>
+      </div>
+    </div>
+</div>
+  </section>
+
+  <!-- BOOKINGS TAB -->
+  <section class="results-section" v-if="tab==='bookings'">
+    <h3 style="font-family:'Sora',sans-serif;font-size:1.45rem;font-weight:700;margin-bottom:28px;letter-spacing:-0.3px;margin-top: 44px;">Mis Reservas</h3>
+    <div class="loading-wrap" v-if="loadingBookings"><div class="spinner"></div></div>
+    <div v-else-if="bookings.length > 0">
+      <table class="bookings-table">
+        <thead><tr>
+          <th>Vuelo</th><th>Ruta</th><th>Fecha</th><th>Aerolínea</th><th>Pasajero</th><th>Precio</th>
+        </tr></thead>
+        <tbody>
+          <tr v-for="b in bookings" :key="b._id">
+            <td style="color:var(--cyan);font-weight:600;font-size:0.8rem;letter-spacing:0.5px">{{ b.flightId }}</td>
+            <td>{{ b.origin }} → {{ b.destination }}</td>
+            <td style="color:var(--muted)">{{ b.date }}</td>
+            <td>{{ b.airline }}</td>
+            <td>
+              <div style="font-weight:500">{{ b.passenger.name }}</div>
+              <div style="color:var(--muted);font-size:0.78rem">{{ b.passenger.email }}</div>
+            </td>
+            <td style="font-family:'Sora',sans-serif;font-weight:700">$ {{ b.price?.toLocaleString('es-MX') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="empty-state" v-else>
+      <div class="empty-icon"><i data-lucide="clipboard-list"></i></div>
+      <h4>Sin reservas aún</h4>
+      <p>Haz tu primera reserva en la sección de vuelos.</p>
+    </div>
+  </section>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-overlay" v-if="modal.open" @click.self="modal.open=false">
+    <div class="modal">
+      <button class="modal-close" @click="modal.open=false">✕</button>
+      <div v-if="modal.success">
+        <div class="success-banner">
+          <div class="success-icon"><i data-lucide="check-circle-2"></i></div>
+          <div class="success-text">
+            <strong>¡Reserva confirmada!</strong>
+            <span>Tu vuelo ha sido registrado exitosamente.</span>
+          </div>
+        </div>
+        <div style="color:var(--muted);font-size:0.875rem;line-height:1.8">
+          <strong style="color:var(--text)">{{ modal.flight?.origin }}</strong> → <strong style="color:var(--text)">{{ modal.flight?.destination }}</strong><br/>
+          Pasajero: {{ modal.form.name }}<br/>
+          Total: <span style="color:var(--cyan);font-weight:700">$ {{ modal.flight?.price?.toLocaleString('es-MX') }} MXN</span>
+        </div>
+        <button class="btn-confirm" style="margin-top:24px;width:100%" @click="modal.open=false">Cerrar</button>
+      </div>
+      <div v-else>
+        <h3>Confirmar reserva</h3>
+        <p class="modal-subtitle">Completa los datos del pasajero</p>
+        <div class="modal-flight-info">
+          <div class="modal-flight-route">{{ modal.flight?.origin }} → {{ modal.flight?.destination }}</div>
+          <div class="modal-flight-meta">
+            <span>{{ modal.flight?.airline }}</span>
+            <span>{{ modal.flight?.departure }} – {{ modal.flight?.arrival }}</span>
+            <span>{{ modal.flight?.date }}</span>
+          </div>
+          <div class="modal-flight-price">$ {{ modal.flight?.price?.toLocaleString('es-MX') }} <span style="font-size:0.82rem;color:var(--muted);font-family:Outfit">MXN</span></div>
+        </div>
+        <div class="modal-field">
+          <label>Nombre completo</label>
+          <input v-model="modal.form.name" type="text" placeholder="Ej: Andrés García González" />
+        </div>
+        <div class="modal-field">
+          <label>Correo electrónico</label>
+          <input v-model="modal.form.email" type="email" placeholder="correo@ejemplo.com" />
+        </div>
+        <div class="error-msg" v-if="modal.error">{{ modal.error }}</div>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="modal.open=false">Cancelar</button>
+          <button class="btn-confirm" @click="confirmBooking" :disabled="modal.booking">
+            {{ modal.booking ? 'Procesando…' : 'Confirmar reserva' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const { createApp } = Vue;
+createApp({
+  data() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return {
+      tab: 'search',
+      today: `${yyyy}-${mm}-${dd}`,
+      search: { origin: '', destination: '', date: `${yyyy}-${mm}-${dd}` },
+      cities: ['Ciudad de México', 'Cancún', 'Guadalajara', 'Monterrey', 'Los Cabos', 'Puerto Vallarta'],
+      flights: [], bookings: [],
+      loading: false, loadingBookings: false,
+      hasSearched: false, searchError: '',
+      modal: { open: false, flight: null, form: { name: '', email: '' }, booking: false, success: false, error: '' }
+    };
+  },
+
+  mounted() {
+    lucide.createIcons();
+  },
+
+  updated() {
+    lucide.createIcons();
+  },
+
+  methods: {
+    async searchFlights() {
+      this.searchError = ''; this.loading = true; this.hasSearched = true; this.flights = [];
+      const params = new URLSearchParams();
+      if (this.search.origin) params.append('origin', this.search.origin);
+      if (this.search.destination) params.append('destination', this.search.destination);
+      if (this.search.date) params.append('date', this.search.date);
+      try { 
+        const res = await fetch(`http://localhost:3000/api/flights?${params}`);
+        if (!res.ok) throw new Error('Error en el servidor');
+        const data = await res.json();
+        this.flights = data.flights || [];
+      } catch (err) {
+        this.searchError = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo.';
+      } finally { this.loading = false; }
+    },
+    openBooking(flight) {
+      this.modal = { open: true, flight, form: { name: '', email: '' }, booking: false, success: false, error: '' };
+    },
+    async confirmBooking() {
+      if (!this.modal.form.name.trim() || !this.modal.form.email.trim()) {
+        this.modal.error = 'Por favor completa todos los campos.'; return;
+      }
+      this.modal.error = ''; this.modal.booking = true;
+      try {
+        const res = await fetch('http://localhost:3000/api/book', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            flightId: this.modal.flight.id,
+            origin: this.modal.flight.origin, destination: this.modal.flight.destination,
+            date: this.modal.flight.date, airline: this.modal.flight.airline,
+            price: this.modal.flight.price,
+            passenger: { name: this.modal.form.name, email: this.modal.form.email }
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al reservar');
+        this.modal.success = true;
+      } catch (err) {
+        this.modal.error = err.message;
+      } finally { this.modal.booking = false; }
+    },
+    async loadBookings() {
+      this.loadingBookings = true;
+      try {
+        const res = await fetch('http://localhost:3000/api/bookings');
+        const data = await res.json();
+        this.bookings = data.bookings || [];
+      } catch { this.bookings = []; }
+      finally { this.loadingBookings = false; }
+    },
+
+    irAReservas() {
+      this.tab = 'bookings';
+      setTimeout(() => this.loadBookings(), 0);
+    }
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
