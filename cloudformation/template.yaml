@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  Infraestructura para Aeroméxico - Sistema de Reservas de Vuelos.
+  Infraestructura para Aeromexico - Sistema de Reservas de Vuelos.
   Crea una instancia EC2 y un bucket S3 para la aplicación.
 
 # PARÁMETROS
@@ -75,7 +75,7 @@ Resources:
   AeroMexSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security Group para Aeroméxico controla acceso a la aplicacion
+      GroupDescription: Security Group para Aeromexico controla acceso a la aplicacion
       SecurityGroupIngress:
         # SSH – CAMBIAR 0.0.0.0/0 por tu IP en produccion: TU_IP/32
         - IpProtocol: tcp
